@@ -255,7 +255,7 @@ def load_transactions_df():
     df["week"] = df["created_at"].dt.to_period("W").dt.start_time
     return df
 
-def totals_for_period(df, date_from=None, date_to=None):
+def totals_for_period(df, period, date_from=None, date_to=None):
     if df.empty:
         return pd.DataFrame()
 
@@ -700,6 +700,7 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
 
