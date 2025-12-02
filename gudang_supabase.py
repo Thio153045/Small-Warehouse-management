@@ -39,12 +39,7 @@
 # );
 # ----------------------------------------------------------------
 #
-# 2) Atur st.secrets di Streamlit (LOCAL: ~/.streamlit/secrets.toml atau Streamlit Cloud Secrets)
-# SUPABASE_URL = 
-# SUPABASE_KEY = "cm9sZSI6ImFub24iLCJpYXQiOjE3NjQwNjIzNDIsImV4cCI6MjA3OTYzODM0Mn0.uAW_wTrjEx0vt4hY6SHCtqcEa3Qjtxk2g7GNa7SrRZ4"
-#
-# 3) Install dependency:
-# pip install streamlit pandas openpyxl supabase altair
+
 
 import streamlit as st
 import pandas as pd
@@ -65,7 +60,8 @@ if "SUPABASE_URL" not in st.secrets or "SUPABASE_KEY" not in st.secrets:
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
+if "auth" not in st.session_state:
+    st.session_state.auth = False
 # -------------------------
 # Utility: hashing password
 # -------------------------
@@ -657,3 +653,4 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
