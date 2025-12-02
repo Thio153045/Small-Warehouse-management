@@ -443,7 +443,7 @@ elif menu == "Barang Masuk":
             qty = cols[2].number_input("Jumlah", min_value=0.0, value=float(it.get("quantity",0.0)), key=f"in_qty_{i}")
             min_s = cols[3].number_input("Min stok", min_value=0.0, value=float(it.get("min_stock",0.0)), key=f"in_min_{i}")
             rack = cols[4].text_input("Rak", value=it.get("rack_location",""), key=f"in_rack_{i}")
-            expiry = cols[5].text_input("Kadaluarsa", value=it.get("expiry_date",""), key=f"in_exp_{i}")
+            expiry = cols[5].text_input("Expired", value=it.get("expiry_date",""), key=f"in_exp_{i}")
 
             # UPDATE data ke session_state (tanpa hapus)
             st.session_state.in_multi[i] = {
@@ -700,6 +700,7 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
 
