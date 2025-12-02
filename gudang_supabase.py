@@ -496,7 +496,7 @@ elif menu == "Barang Keluar":
                                 trx_code = generate_trx_code("out")
                                 add_transaction_record("out", item_id, name, qty, unit, requester=requester, supplier=None, note=note, bundle_code=trx_code, trx_code=trx_code)
                                 st.success(f"Sukses: {qty} {unit} {name} dikeluarkan. Trx: {trx_code}")
-                                st.created_atrerun()
+                                st.rerun()
     else:
         # multi-item keluar
         if "out_multi" not in st.session_state:
@@ -558,7 +558,7 @@ elif menu == "Barang Keluar":
                                 add_transaction_record("out", item_id, it["name"], it["quantity"], it["unit"], requester=requester, supplier=None, note=it.get("note",""), bundle_code=bundle, trx_code=trx_code)
                             st.success(f"Sukses menyimpan batch keluar. Trx: {trx_code}")
                             st.session_state.out_multi = []
-                            st.created_atrerun()
+                            st.rerun()
 
     st.markdown("---")
     st.subheader("Inventaris Saat Ini")
@@ -653,5 +653,6 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
