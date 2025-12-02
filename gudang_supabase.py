@@ -497,7 +497,7 @@ elif menu == "Barang Masuk":
 
                 st.success("Transaksi berhasil disimpan!")
 
-                            item_id = upsert_item(it["name"], it.get("category",""), it["unit"], it["quantity"], it.get("min_stock",0.0), it.get("rack_location",""), exp)
+                        item_id = upsert_item(it["name"], it.get("category",""), it["unit"], it["quantity"], it.get("min_stock",0.0), it.get("rack_location",""), exp)
                             add_transaction_record("in", item_id, it["name"], it["quantity"], it["unit"], requester=None, supplier=supplier, note=note, bundle_code=bundle, trx_code=trx_code, expiry_date=exp)
                         st.success(f"Sukses menyimpan batch masuk. Trx: {trx_code}")
                         st.session_state.in_multi = []
@@ -700,6 +700,7 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
 
