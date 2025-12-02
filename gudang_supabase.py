@@ -630,7 +630,7 @@ elif menu == "Laporan & Analisis":
     if df.empty:
         st.info("Belum ada transaksi untuk ditampilkan")
     else:
-        totals = totals_for_period(df, date_from=date_from, date_to=date_to)
+        totals = totals_for_period(df, period,date_from=date_from, date_to=date_to)
         st.subheader("Total per Item dalam Periode Terpilih")
         st.dataframe(totals)
         in_period = df[(df["trx_type"]=="in") & (df["date"]>=date_from) & (df["date"]<=date_to)]
@@ -701,6 +701,7 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
 
