@@ -327,7 +327,7 @@ if menu == "Dashboard":
 
     st.subheader("Total per Item (seluruh waktu)")
     df_all = load_transactions_df()
-    totals_all = totals_for_period(df_all)
+    totals_all = totals_for_period(df_all,period)
     st.dataframe(totals_all)
 
     if not df_all.empty:
@@ -700,6 +700,7 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
 
