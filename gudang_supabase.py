@@ -401,19 +401,19 @@ elif menu == "Barang Masuk":
 
     else:
     # Multi-item
-    if "in_multi" not in st.session_state:
-        st.session_state.in_multi = []
+        if "in_multi" not in st.session_state:
+            st.session_state.in_multi = []
 
-    if st.button("Tambah Item"):
-        st.session_state.in_multi.append({
-            "name": "",
-            "unit": "",
-            "quantity": 0.0,
-            "category": "",
-            "min_stock": 0.0,
-            "rack_location": "",
-            "expiry_date": ""
-        })
+        if st.button("Tambah Item"):
+            st.session_state.in_multi.append({
+                "name": "",
+                "unit": "",
+                "quantity": 0.0,
+                "category": "",
+                "min_stock": 0.0,
+                "rack_location": "",
+                "expiry_date": ""
+            })
 
     # -------------------------------
     # FORM INPUT (tanpa tombol Hapus)
@@ -700,6 +700,7 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
 
