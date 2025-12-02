@@ -397,7 +397,7 @@ elif menu == "Barang Masuk":
                     trx_code = generate_trx_code("in")
                     add_transaction_record("in", item_id, name, qty, unit, requester=None, supplier=supplier, note="Single-item masuk", bundle_code=trx_code, trx_code=trx_code, expiry_date=expiry_date)
                     st.success(f"Sukses: {qty} {unit} {name} ditambahkan. Trx: {trx_code}")
-                    st.created_atrerun()
+                    st.rerun()
 
     else:
         # Multi-item
@@ -653,4 +653,5 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
