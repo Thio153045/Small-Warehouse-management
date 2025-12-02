@@ -400,61 +400,108 @@ elif menu == "Barang Masuk":
                     st.rerun()
 
     else:
-        # Multi-item
-        if "in_multi" not in st.session_state:
-            st.session_state.in_multi = []
-        if st.button("Tambah Item"):
-            st.session_state.in_multi.append({"name":"","unit":"","quantity":0.0,"category":"","min_stock":0.0,"rack_location":"","expiry_date":""})
-        with st.form("in_multi_form"):
-            supplier = st.text_input("Nama pemasok")
-            note = st.text_area("Catatan transaksi (opsional)")
-            for i, it in enumerate(st.session_state.in_multi):
-                st.markdown(f"**Item #{i+1}**")
-                cols = st.columns([3,1,1,1,1,1,1])
-                name_choice = cols[0].selectbox(f"Nama {i+1}", options=["-- (new/pilih) --"]+items_list, key=f"in_name_sel_{i}")
-                if name_choice != "-- (new/pilih) --":
-                    name = name_choice
-                    unit = get_item_unit(name)
-                    cols[1].text_input("Satuan", value=unit, key=f"in_unit_{i}")
-                else:
-                    name = cols[0].text_input("Nama barang", value=it.get("name",""), key=f"in_name_{i}")
-                    unit = cols[1].text_input("Satuan", value=it.get("unit",""), key=f"in_unit_new_{i}")
-                qty = cols[2].number_input("Jumlah", min_value=0.0, value=float(it.get("quantity",0.0)), key=f"in_qty_{i}")
-                min_s = cols[3].number_input("Min stok", min_value=0.0, value=float(it.get("min_stock",0.0)), key=f"in_min_{i}")
-                rack = cols[4].text_input("Rak", value=it.get("rack_location",""), key=f"in_rack_{i}")
-                expiry = cols[5].text_input("Kadaluarsa", value=it.get("expiry_date",""), key=f"in_exp_{i}")
-                remove = cols[6].button("Hapus", key=f"in_del_{i}")
-                if remove:
-                    st.session_state.in_multi.pop(i)
-                    st.created_atrerun()
-                st.session_state.in_multi[i] = {"name": name, "unit": unit, "quantity": qty, "category": it.get("category",""), "min_stock": min_s, "rack_location": rack, "expiry_date": expiry}
-            submitted = st.form_submit_button("Simpan Transaksi Masuk (Batch)")
-            if submitted:
-                if not st.session_state.in_multi:
-                    st.error("Tidak ada item untuk disimpan")
-                else:
-                    errors = []
-                    for idx, it in enumerate(st.session_state.in_multi):
-                        if not it["name"] or it["quantity"] <= 0 or not it["unit"]:
-                            errors.append(f"Baris {idx+1}: Nama, satuan, dan jumlah (>0) harus diisi")
-                    if errors:
-                        st.error("\n".join(errors))
-                    else:
-                        trx_code = generate_trx_code("in")
-                        bundle = trx_code
-                        for it in st.session_state.in_multi:
-                            # convert expiry if string to date if possible
+    # Multi-item
+    if "in_multi" not in st.session_state:
+        st.session_state.in_multi = []
+
+    if st.button("Tambah Item"):
+        st.session_state.in_multi.append({
+            "name": "",
+            "unit": "",
+            "quantity": 0.0,
+            "category": "",
+            "min_stock": 0.0,
+            "rack_location": "",
+            "expiry_date": ""
+        })
+
+    # -------------------------------
+    # FORM INPUT (tanpa tombol Hapus)
+    # -------------------------------
+    with st.form("in_multi_form"):
+        supplier = st.text_input("Nama pemasok")
+        note = st.text_area("Catatan transaksi (opsional)")
+
+        for i, it in enumerate(st.session_state.in_multi):
+            st.markdown(f"**Item #{i+1}**")
+            cols = st.columns([3,1,1,1,1,1,1])
+
+            name_choice = cols[0].selectbox(
+                f"Nama {i+1}",
+                options=["-- (new/pilih) --"] + items_list,
+                key=f"in_name_sel_{i}"
+            )
+
+            if name_choice != "-- (new/pilih) --":
+                name = name_choice
+                unit = get_item_unit(name)
+                cols[1].text_input("Satuan", value=unit, key=f"in_unit_{i}")
+            else:
+                name = cols[0].text_input("Nama barang", value=it.get("name",""), key=f"in_name_{i}")
+                unit = cols[1].text_input("Satuan", value=it.get("unit",""), key=f"in_unit_new_{i}")
+
+            qty = cols[2].number_input("Jumlah", min_value=0.0, value=float(it.get("quantity",0.0)), key=f"in_qty_{i}")
+            min_s = cols[3].number_input("Min stok", min_value=0.0, value=float(it.get("min_stock",0.0)), key=f"in_min_{i}")
+            rack = cols[4].text_input("Rak", value=it.get("rack_location",""), key=f"in_rack_{i}")
+            expiry = cols[5].text_input("Kadaluarsa", value=it.get("expiry_date",""), key=f"in_exp_{i}")
+
+            # UPDATE data ke session_state (tanpa hapus)
+            st.session_state.in_multi[i] = {
+                "name": name,
+                "unit": unit,
+                "quantity": qty,
+                "category": it.get("category",""),
+                "min_stock": min_s,
+                "rack_location": rack,
+                "expiry_date": expiry
+            }
+
+        submitted = st.form_submit_button("Simpan Transaksi Masuk (Batch)")
+
+    # -------------------------------
+    # TOMBOL HAPUS – DI LUAR FORM !!!
+    # -------------------------------
+    for i in range(len(st.session_state.in_multi)):
+        cols = st.columns([5,1])
+        cols[0].write(f"Item #{i+1}")
+        if cols[1].button("Hapus", key=f"delete_{i}"):
+            st.session_state.in_multi.pop(i)
+            st.rerun()
+
+    # -------------------------------
+    # Proses submit
+    # -------------------------------
+    if submitted:
+        if not st.session_state.in_multi:
+            st.error("Tidak ada item untuk disimpan")
+        else:
+            errors = []
+            for idx, it in enumerate(st.session_state.in_multi):
+                if not it["name"] or it["quantity"] <= 0 or not it["unit"]:
+                    errors.append(f"Baris {idx+1}: Nama, satuan, dan jumlah (>0) harus diisi")
+
+            if errors:
+                st.error("\n".join(errors))
+            else:
+                trx_code = generate_trx_code("in")
+                bundle = trx_code
+
+                for it in st.session_state.in_multi:
+                    # convert expiry if possible
+                    exp = None
+                    if it.get("expiry_date"):
+                        try:
+                            exp = pd.to_datetime(it.get("expiry_date")).date()
+                        except:
                             exp = None
-                            if it.get("expiry_date"):
-                                try:
-                                    exp = pd.to_datetime(it.get("expiry_date")).date()
-                                except:
-                                    exp = None
+
+                st.success("Transaksi berhasil disimpan!")
+
                             item_id = upsert_item(it["name"], it.get("category",""), it["unit"], it["quantity"], it.get("min_stock",0.0), it.get("rack_location",""), exp)
                             add_transaction_record("in", item_id, it["name"], it["quantity"], it["unit"], requester=None, supplier=supplier, note=note, bundle_code=bundle, trx_code=trx_code, expiry_date=exp)
                         st.success(f"Sukses menyimpan batch masuk. Trx: {trx_code}")
                         st.session_state.in_multi = []
-                        st.created_atrerun()
+                        st.rerun()
 
 # --- Barang Keluar ---
 elif menu == "Barang Keluar":
@@ -653,6 +700,7 @@ elif menu == "Pengaturan":
             supabase.table("items").delete().neq("id", -1).execute()
             supabase.table("users").delete().neq("username", "keep_admin").execute()  # contoh: mengosongkan users
             st.success("DB telah dikosongkan. Silakan refresh.")
+
 
 
 
